@@ -55,15 +55,14 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        // Wait for the Transformers library to be loaded
-        if (!window.Transformers) {
-            loadingStatus.textContent = "Waiting for library to load...";
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return initializeModel(); // Try again after a delay
+        // Access the pipeline directly from the global scope
+        if (typeof pipeline === 'undefined') {
+            pipeline = window.pipeline;
         }
         
-        pipeline = window.Transformers.pipeline;
-        env = window.Transformers.env;
+        if (typeof env === 'undefined') {
+            env = window.env;
+        }
         
         // Configure WASM backend if env is available
         if (env && env.backends && env.backends.onnx) {
