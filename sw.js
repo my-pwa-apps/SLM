@@ -1,4 +1,4 @@
-const CACHE_NAME = 'slm-cache-v9';
+const CACHE_NAME = 'slm-cache-v10'; // Incremented cache version
 const urlsToCache = [
   './',
   './index.html',
