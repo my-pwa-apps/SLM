@@ -51,16 +51,10 @@ let generator;
 async function initializeModel() {
     try {
         console.log("Starting model initialization");
-        
-        // Access the pipeline from window object (previously set in the HTML)
-        // Changed window.pipeline to window.Xenova.pipeline
-        const pipelineFunc = window.Xenova.pipeline; 
-        
-        if (!pipelineFunc) {
-            // Updated error message to reflect the change
-            throw new Error("Pipeline function (window.Xenova.pipeline) is not available. Make sure the transformers library is loaded properly.");
-        }
-        
+
+        // Wait for the pipeline to be available
+        const pipelineFunc = await waitForPipeline();
+
         // Initialize the pipeline
         generator = await pipelineFunc(
             'text-generation',
@@ -81,6 +75,18 @@ async function initializeModel() {
         modelStatus.classList.add('error');
         loadingStatus.textContent = 'Failed to load model.';
     }
+}
+
+async function waitForPipeline(retries = 5, delay = 1000) {
+    while (retries > 0) {
+        if (window.Xenova && window.Xenova.pipeline) {
+            return window.Xenova.pipeline;
+        }
+        console.warn(`Xenova not ready, retrying... (${retries} retries left)`);
+        retries--;
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    throw new Error("Pipeline function (window.Xenova.pipeline) is not available after retries. Make sure the transformers library is loaded properly.");
 }
 
 // Generate text based on prompt
