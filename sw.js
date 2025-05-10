@@ -6,8 +6,7 @@ const urlsToCache = [
   './script.js',
   './manifest.json',
   './icon.png',
-  './favicon.ico',
-  'https://cdn.jsdelivr.net/npm/@xenova/transformers@1.3.1/dist/transformers.min.js'
+  './favicon.ico'
 ];
 
 // Install event - cache assets
