@@ -31,8 +31,27 @@
                 <div id="loading-progress" class="loading-progress"></div>
             </div>    <div id="loading-status">Initializing...</div>        </div>    </div>
     <!-- Import the Transformers.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@1.3.1/dist/transformers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@1.3.1/dist/transformers.min.js"
+            onerror="handleTransformerScriptError()"></script>
     <script>
+        function handleTransformerScriptError() {
+            console.error("CRITICAL: The Transformers.js library script failed to load. Check network connection and browser console for details. The library might be blocked or the CDN unavailable.");
+            const modelStatus = document.getElementById('model-status');
+            const generateBtn = document.getElementById('generate-btn');
+            const loadingStatus = document.getElementById('loading-status');
+
+            if (modelStatus) {
+                modelStatus.textContent = "Error: AI Library Load Failed. Refresh or check console.";
+                modelStatus.style.color = "red";
+            }
+            if (generateBtn) {
+                generateBtn.disabled = true;
+            }
+            if (loadingStatus) {
+                loadingStatus.textContent = "AI model library could not be loaded.";
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM loaded. Waiting for Transformers.js library to initialize...");
 
@@ -44,7 +63,7 @@
                 document.body.appendChild(script);
             }
 
-            function waitForXenova(callback, retries = 300, interval = 100) { // Poll for up to 30 seconds (300 retries * 100ms)
+            function waitForXenova(callback, retries = 600, interval = 100) { // Poll for up to 60 seconds (increased from 300)
                 if (typeof window.Xenova !== 'undefined' && typeof window.Xenova.pipeline === 'function') {
                     console.log("Transformers.js library initialized. Xenova.pipeline is available.");
                     callback();
@@ -52,7 +71,7 @@
                     console.warn(`Xenova not ready, retrying... (${retries} retries left)`);
                     setTimeout(() => waitForXenova(callback, retries - 1, interval), interval);
                 } else {
-                    console.error("Transformers.js library failed to initialize Xenova.pipeline in time.");
+                    console.error("Transformers.js library failed to initialize Xenova.pipeline in time (60s). It might have loaded but failed to set up Xenova.pipeline, or it didn't load at all.");
                     const modelStatus = document.getElementById('model-status');
                     const generateBtn = document.getElementById('generate-btn');
                     if (modelStatus) {
