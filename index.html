@@ -49,7 +49,7 @@
                     console.log("Transformers.js library initialized. Xenova.pipeline is available.");
                     callback();
                 } else if (retries > 0) {
-                    // console.log(`Xenova not ready, retrying... (${retries} retries left)`);
+                    console.warn(`Xenova not ready, retrying... (${retries} retries left)`);
                     setTimeout(() => waitForXenova(callback, retries - 1, interval), interval);
                 } else {
                     console.error("Transformers.js library failed to initialize Xenova.pipeline in time.");
