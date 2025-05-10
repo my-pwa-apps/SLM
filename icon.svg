@@ -1,0 +1,6 @@
+<!-- This is an SVG icon for our application -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#4285f4" />
+  <text x="256" y="256" font-family="Arial" font-size="100" text-anchor="middle" fill="white" dominant-baseline="middle">SLM</text>
+  <text x="256" y="320" font-family="Arial" font-size="32" text-anchor="middle" fill="white" dominant-baseline="middle">Language Model</text>
+</svg>
