@@ -53,10 +53,12 @@ async function initializeModel() {
         console.log("Starting model initialization");
         
         // Access the pipeline from window object (previously set in the HTML)
-        const pipelineFunc = window.pipeline;
+        // Changed window.pipeline to window.Xenova.pipeline
+        const pipelineFunc = window.Xenova.pipeline; 
         
         if (!pipelineFunc) {
-            throw new Error("Pipeline function is not available. Make sure the transformers library is loaded properly.");
+            // Updated error message to reflect the change
+            throw new Error("Pipeline function (window.Xenova.pipeline) is not available. Make sure the transformers library is loaded properly.");
         }
         
         // Initialize the pipeline
