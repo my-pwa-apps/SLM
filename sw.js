@@ -1,4 +1,4 @@
-const CACHE_NAME = 'slm-cache-v5';
+const CACHE_NAME = 'slm-cache-v6';
 const urlsToCache = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const urlsToCache = [
   './manifest.json',
   './icon.png',
   './favicon.ico',
-  'https://unpkg.com/@xenova/transformers@2.8.0/dist/transformers.min.js'
+  'https://cdn.jsdelivr.net/npm/@xenova/transformers@1.4.2'
 ];
 
 // Install event - cache assets

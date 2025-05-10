@@ -16,6 +16,11 @@ const outputText = document.getElementById('output-text');
 const loadingProgress = document.getElementById('loading-progress');
 const loadingStatus = document.getElementById('loading-status');
 
+// Wait a moment to ensure the DOM is fully loaded before initializing
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initializeModel, 500);
+});
+
 // Class to handle loading status updates
 class MyProgressCallback {
     constructor() {
@@ -55,17 +60,16 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        // Wait until the library is fully loaded
-        if (typeof window.Transformers === 'undefined' || 
-            typeof window.Transformers.pipeline === 'undefined') {
+        // Check if the library has been loaded and exposed globally
+        if (typeof window.pipeline === 'undefined') {
             loadingStatus.textContent = "Waiting for library to load...";
             setTimeout(initializeModel, 500);
             return;
         }
 
-        // Access pipeline and env from the Transformers global object
-        pipeline = window.Transformers.pipeline;
-        env = window.Transformers.env;
+        // Access pipeline and env from the global objects set by the module script
+        pipeline = window.pipeline;
+        env = window.env;
         
         // Configure WASM backend if env is available
         if (env && env.backends && env.backends.onnx) {
@@ -137,6 +141,3 @@ promptInput.addEventListener('keydown', (e) => {
         generateText();
     }
 });
-
-// Initialize the model when the page loads
-document.addEventListener('DOMContentLoaded', initializeModel);
