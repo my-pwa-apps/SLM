@@ -37,6 +37,14 @@ self.addEventListener('activate', event => {
 
 // Fetch event - serve from cache if available, otherwise fetch from network
 self.addEventListener('fetch', event => {
+  const transformersUrl = 'https://cdn.jsdelivr.net/npm/@xenova/transformers@1.3.1/dist/transformers.min.js';
+
+  if (event.request.url === transformersUrl) {
+    // Always fetch transformers.min.js from network directly
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
