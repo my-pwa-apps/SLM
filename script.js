@@ -52,8 +52,15 @@ async function initializeModel() {
     try {
         console.log("Starting model initialization");
         
+        // Access the pipeline from window object (previously set in the HTML)
+        const pipelineFunc = window.pipeline;
+        
+        if (!pipelineFunc) {
+            throw new Error("Pipeline function is not available. Make sure the transformers library is loaded properly.");
+        }
+        
         // Initialize the pipeline
-        generator = await pipeline(
+        generator = await pipelineFunc(
             'text-generation',
             MODEL_ID,
             {
@@ -118,5 +125,10 @@ promptInput.addEventListener('keydown', (e) => {
     }
 });
 
-// Start initialization when the script is loaded
-initializeModel();
+// Start initialization when document is fully loaded to ensure pipeline is available
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeModel);
+} else {
+    // If DOMContentLoaded already fired, call directly but with a short delay
+    setTimeout(initializeModel, 100);
+}
