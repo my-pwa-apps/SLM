@@ -44,7 +44,7 @@
                 document.body.appendChild(script);
             }
 
-            function waitForXenova(callback, retries = 100, interval = 100) { // Poll for up to 10 seconds (100 retries * 100ms)
+            function waitForXenova(callback, retries = 300, interval = 100) { // Poll for up to 30 seconds (300 retries * 100ms)
                 if (typeof window.Xenova !== 'undefined' && typeof window.Xenova.pipeline === 'function') {
                     console.log("Transformers.js library initialized. Xenova.pipeline is available.");
                     callback();
