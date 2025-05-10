@@ -50,21 +50,18 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        console.log("Starting model initialization (from script.js)");
-
-        // Xenova.pipeline should be available here due to index.html's waitForXenova
-        if (!window.Xenova || typeof window.Xenova.pipeline !== 'function') {
-            console.error("CRITICAL: Xenova.pipeline not available when initializeModel was called. Check loading sequence and Transformers.js library.");
-            modelStatus.textContent = 'Error: AI Library components not ready.';
+        console.log("Attempting to initialize model using window.Xenova.pipeline...");
+        if (typeof window.Xenova === 'undefined' || typeof window.Xenova.pipeline !== 'function') {
+            console.error("CRITICAL: initializeModel called but Xenova.pipeline is not available. This should not happen if index.html's waitForXenova worked correctly.");
+            modelStatus.textContent = 'Error: AI Library not ready.';
             modelStatus.classList.add('error');
-            loadingStatus.textContent = 'Failed to initialize model components.';
-            if (generateBtn) generateBtn.disabled = true;
+            loadingStatus.textContent = 'Failed to initialize model: AI library component missing.';
             return;
         }
-        const pipelineFunc = window.Xenova.pipeline;
 
+        console.log("Xenova.pipeline seems available. Proceeding with model initialization.");
         // Initialize the pipeline
-        generator = await pipelineFunc(
+        generator = await window.Xenova.pipeline( // Use window.Xenova.pipeline directly
             'text-generation',
             MODEL_ID,
             {

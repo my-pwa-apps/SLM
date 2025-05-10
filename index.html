@@ -30,7 +30,8 @@
             </div>    <div id="loading-status">Initializing...</div>        </div>    </div>
     <!-- Import the Transformers.js library -->
     <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@1.3.1/dist/transformers.min.js"
-            onerror="handleTransformerScriptError()"></script>
+            onerror="handleTransformerScriptError()"
+            onload="onTransformersJsLoaded()"></script> <!-- MODIFIED: Added onload handler -->
     <script>
         function handleTransformerScriptError() {
             console.error("CRITICAL: The Transformers.js library script failed to load. Check network connection and browser console for details. The library might be blocked or the CDN unavailable.");
@@ -50,68 +51,85 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM loaded. Waiting for Transformers.js library to initialize...");
+        // MOVED loadAppScript and waitForXenova outside DOMContentLoaded
+        // to make them accessible and ensure correct execution order.
 
-            function loadAppScript() {
-                const script = document.createElement('script');
-                script.src = "script.js";
-                script.onload = () => {
-                    console.log("Application script (script.js) loaded. Xenova should be ready. Now calling initializeModel().");
-                    if (typeof initializeModel === 'function') {
-                        initializeModel(); // Call initializeModel from script.js
-                    } else {
-                        console.error("CRITICAL: initializeModel is not defined. Make sure script.js loaded correctly and defines it globally.");
-                        const modelStatus = document.getElementById('model-status');
-                        if (modelStatus) {
-                            modelStatus.textContent = "Error: App script error. Check console.";
-                            modelStatus.style.color = "red";
-                        }
-                    }
-                };
-                script.onerror = () => {
-                    console.error("CRITICAL: Application script (script.js) failed to load.");
-                    const modelStatus = document.getElementById('model-status');
-                    if (modelStatus) {
-                        modelStatus.textContent = "Error: App script failed. Check console.";
-                        modelStatus.style.color = "red";
-                    }
-                };
-                document.body.appendChild(script);
-            }
-
-            function waitForXenova(callback, retries = 600, interval = 100) { // Poll for up to 60 seconds (increased from 300)
-                if (typeof window.Xenova !== 'undefined' && typeof window.Xenova.pipeline === 'function') {
-                    console.log("Transformers.js library initialized. Xenova.pipeline is available.");
-                    callback();
-                } else if (retries > 0) {
-                    let xenovaStatus = "window.Xenova is undefined";
-                    if (window.Xenova) {
-                        xenovaStatus = "window.Xenova is defined, but window.Xenova.pipeline is " + typeof window.Xenova.pipeline;
-                    }
-                    console.warn(`Xenova not ready (${xenovaStatus}), retrying... (${retries} retries left)`);
-                    setTimeout(() => waitForXenova(callback, retries - 1, interval), interval);
+        function loadAppScript() {
+            console.log("loadAppScript called. Xenova.pipeline should be ready. Loading script.js...");
+            const appScript = document.createElement('script');
+            appScript.src = "script.js"; // Ensure this path is correct
+            appScript.onload = () => {
+                console.log("script.js loaded successfully.");
+                if (typeof initializeModel === 'function') {
+                    console.log("Calling initializeModel() from index.html after script.js load.");
+                    initializeModel(); // Call initializeModel defined in script.js
                 } else {
-                    console.error("Transformers.js library failed to initialize Xenova.pipeline in time (60s). It might have loaded but failed to set up Xenova.pipeline, or it didn't load at all.");
-                    const modelStatus = document.getElementById('model-status');
-                    const generateBtn = document.getElementById('generate-btn');
-                    if (modelStatus) {
-                        modelStatus.textContent = "Error: Could not load AI model library. Please refresh.";
-                        modelStatus.style.color = "red";
+                    console.error("CRITICAL: script.js loaded but initializeModel() function is not defined. Check script.js.");
+                    const modelStatusElem = document.getElementById('model-status');
+                    if (modelStatusElem) {
+                        modelStatusElem.textContent = 'Error: App initialization logic failed.';
+                        modelStatusElem.style.color = "red";
                     }
-                    if (generateBtn) {
-                        generateBtn.disabled = true;
-                    }
-                    // Also update loading status if it's visible
-                    const loadingStatus = document.getElementById('loading-status');
-                    if (loadingStatus) {
-                        loadingStatus.textContent = "Model library failed to load.";
+                    const loadingStatusElem = document.getElementById('loading-status');
+                    if (loadingStatusElem) {
+                        loadingStatusElem.textContent = "App initialization failed.";
                     }
                 }
-            }
+            };
+            appScript.onerror = () => {
+                console.error("Failed to load script.js.");
+                const modelStatusElem = document.getElementById('model-status');
+                if (modelStatusElem) {
+                    modelStatusElem.textContent = 'Error: Failed to load application script.';
+                    modelStatusElem.style.color = "red";
+                }
+                const loadingStatusElem = document.getElementById('loading-status');
+                if (loadingStatusElem) {
+                    loadingStatusElem.textContent = "App script load failed.";
+                }
+            };
+            document.body.appendChild(appScript);
+        }
 
-            // Start waiting for Xenova and then load script.js
+        function waitForXenova(callback, retries = 600, interval = 100) { // Poll for up to 60 seconds
+            console.log("waitForXenova: Checking for window.Xenova.pipeline...");
+            if (typeof window.Xenova !== 'undefined' && typeof window.Xenova.pipeline === 'function') {
+                console.log("Transformers.js library initialized. Xenova.pipeline IS available.");
+                callback(); // This will be loadAppScript
+            } else if (retries > 0) {
+                console.warn(`Xenova not ready, retrying... (${retries} retries left). window.Xenova is: ${typeof window.Xenova}, window.Xenova.pipeline is: ${typeof window.Xenova !== 'undefined' ? typeof window.Xenova.pipeline : 'N/A'}`);
+                setTimeout(() => waitForXenova(callback, retries - 1, interval), interval);
+            } else {
+                console.error("Transformers.js library failed to initialize Xenova.pipeline in time (60s). It might have loaded but failed to set up Xenova.pipeline, or it didn't load at all.");
+                const modelStatusElem = document.getElementById('model-status');
+                const generateBtnElem = document.getElementById('generate-btn');
+                const loadingStatusElem = document.getElementById('loading-status');
+
+                if (modelStatusElem) {
+                    modelStatusElem.textContent = "Error: Could not load AI model library. Please refresh.";
+                    modelStatusElem.style.color = "red";
+                }
+                if (generateBtnElem) {
+                    generateBtnElem.disabled = true;
+                }
+                if (loadingStatusElem) {
+                    loadingStatusElem.textContent = "Model library failed to load.";
+                }
+            }
+        }
+
+        // This function is called by the onload attribute of the Transformers.js script tag
+        function onTransformersJsLoaded() {
+            console.log("Transformers.js SCRIPT has finished loading. Now starting to wait for Xenova.pipeline to be defined by it.");
             waitForXenova(loadAppScript);
+        }
+
+        // MODIFIED DOMContentLoaded listener:
+        // The main initialization chain is now started by onTransformersJsLoaded.
+        // This listener is for any other DOM-dependent setup not related to script loading.
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded and parsed. Transformers.js loading and app initialization are handled by the script's onload event and subsequent callbacks.");
+            // Any other DOM-dependent initializations that are NOT related to Xenova/script.js loading can go here.
         });
     </script>
 </body>
