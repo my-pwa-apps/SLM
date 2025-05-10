@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="theme-color" content="#4285f4">
-    <title>Simple Language Model</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Simple Language Model</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
@@ -92,19 +90,6 @@
             // Start waiting for Xenova and then load script.js
             waitForXenova(loadAppScript);
         });
-    </script>
-    <script>        // Register service worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registered with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('ServiceWorker registration failed:', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>
