@@ -50,10 +50,18 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        console.log("Starting model initialization");
+        console.log("Starting model initialization (from script.js)");
 
-        // Wait for the pipeline to be available
-        const pipelineFunc = await waitForPipeline();
+        // Xenova.pipeline should be available here due to index.html's waitForXenova
+        if (!window.Xenova || typeof window.Xenova.pipeline !== 'function') {
+            console.error("CRITICAL: Xenova.pipeline not available when initializeModel was called. Check loading sequence and Transformers.js library.");
+            modelStatus.textContent = 'Error: AI Library components not ready.';
+            modelStatus.classList.add('error');
+            loadingStatus.textContent = 'Failed to initialize model components.';
+            if (generateBtn) generateBtn.disabled = true;
+            return;
+        }
+        const pipelineFunc = window.Xenova.pipeline;
 
         // Initialize the pipeline
         generator = await pipelineFunc(
@@ -75,18 +83,6 @@ async function initializeModel() {
         modelStatus.classList.add('error');
         loadingStatus.textContent = 'Failed to load model.';
     }
-}
-
-async function waitForPipeline(retries = 5, delay = 1000) {
-    while (retries > 0) {
-        if (window.Xenova && window.Xenova.pipeline) {
-            return window.Xenova.pipeline;
-        }
-        console.warn(`Xenova not ready, retrying... (${retries} retries left)`);
-        retries--;
-        await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    throw new Error("Pipeline function (window.Xenova.pipeline) is not available after retries. Make sure the transformers library is loaded properly.");
 }
 
 // Generate text based on prompt
@@ -132,11 +128,3 @@ promptInput.addEventListener('keydown', (e) => {
         generateText();
     }
 });
-
-// Start initialization when document is fully loaded to ensure pipeline is available
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeModel);
-} else {
-    // If DOMContentLoaded already fired, call directly but with a short delay
-    setTimeout(initializeModel, 100);
-}

@@ -7,7 +7,6 @@ A minimal in-browser language model application that runs entirely client-side u
 - Runs completely in the browser using WebAssembly
 - Uses Hugging Face's Transformers.js library
 - Loads a lightweight transformer model (Xenova/distilgpt2)
-- Works offline after initial load (Progressive Web App)
 - Simple, responsive UI that works on both desktop and mobile
 - Real-time text generation based on user prompts
 
@@ -51,7 +50,6 @@ http-server
 - **Model**: Xenova/distilgpt2 (a lightweight version of GPT-2)
 - **Library**: Transformers.js (WebAssembly-compatible version of Hugging Face Transformers)
 - **Frontend**: Vanilla JavaScript, HTML, and CSS
-- **Offline Capability**: Service Worker for caching and Progressive Web App functionality
 
 ## Performance Considerations
 

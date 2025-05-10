@@ -56,8 +56,27 @@
             function loadAppScript() {
                 const script = document.createElement('script');
                 script.src = "script.js";
-                script.onload = () => console.log("Application script loaded and Xenova should be ready.");
-                script.onerror = () => console.error("Application script failed to load.");
+                script.onload = () => {
+                    console.log("Application script (script.js) loaded. Xenova should be ready. Now calling initializeModel().");
+                    if (typeof initializeModel === 'function') {
+                        initializeModel(); // Call initializeModel from script.js
+                    } else {
+                        console.error("CRITICAL: initializeModel is not defined. Make sure script.js loaded correctly and defines it globally.");
+                        const modelStatus = document.getElementById('model-status');
+                        if (modelStatus) {
+                            modelStatus.textContent = "Error: App script error. Check console.";
+                            modelStatus.style.color = "red";
+                        }
+                    }
+                };
+                script.onerror = () => {
+                    console.error("CRITICAL: Application script (script.js) failed to load.");
+                    const modelStatus = document.getElementById('model-status');
+                    if (modelStatus) {
+                        modelStatus.textContent = "Error: App script failed. Check console.";
+                        modelStatus.style.color = "red";
+                    }
+                };
                 document.body.appendChild(script);
             }
 
@@ -66,7 +85,11 @@
                     console.log("Transformers.js library initialized. Xenova.pipeline is available.");
                     callback();
                 } else if (retries > 0) {
-                    console.warn(`Xenova not ready, retrying... (${retries} retries left)`);
+                    let xenovaStatus = "window.Xenova is undefined";
+                    if (window.Xenova) {
+                        xenovaStatus = "window.Xenova is defined, but window.Xenova.pipeline is " + typeof window.Xenova.pipeline;
+                    }
+                    console.warn(`Xenova not ready (${xenovaStatus}), retrying... (${retries} retries left)`);
                     setTimeout(() => waitForXenova(callback, retries - 1, interval), interval);
                 } else {
                     console.error("Transformers.js library failed to initialize Xenova.pipeline in time (60s). It might have loaded but failed to set up Xenova.pipeline, or it didn't load at all.");
