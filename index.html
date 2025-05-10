@@ -30,19 +30,23 @@
             <div id="loading-bar" class="loading-bar">
                 <div id="loading-progress" class="loading-progress"></div>
             </div>
-    <div id="loading-status">Initializing...</div>        </div>    </div>
-    <script>
+    <div id="loading-status">Initializing...</div>        </div>    </div>    <script>
         // Define a function to dynamically load the transformers library
         function loadTransformers() {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.src = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.8.0";
+                // Use the IIFE build which is browser-compatible
+                script.src = "https://unpkg.com/@xenova/transformers@2.8.0/dist/transformers.min.js";
                 script.onload = () => {
-                    window.Transformers = { 
-                        pipeline: window.pipeline,
-                        env: window.env
-                    };
-                    resolve();
+                    // Make sure we wait a bit for the library to initialize
+                    setTimeout(() => {
+                        window.Transformers = {
+                            pipeline: window.pipeline,
+                            env: window.env
+                        };
+                        console.log("Transformers library loaded successfully");
+                        resolve();
+                    }, 100);
                 };
                 script.onerror = (error) => reject(error);
                 document.head.appendChild(script);

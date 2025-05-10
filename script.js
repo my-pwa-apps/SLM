@@ -56,7 +56,8 @@ let generator;
 async function initializeModel() {
     try {
         // Wait until the library is fully loaded
-        if (typeof window.Transformers === 'undefined') {
+        if (typeof window.Transformers === 'undefined' || 
+            typeof window.Transformers.pipeline === 'undefined') {
             loadingStatus.textContent = "Waiting for library to load...";
             setTimeout(initializeModel, 500);
             return;
