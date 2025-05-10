@@ -30,23 +30,32 @@
             <div id="loading-bar" class="loading-bar">
                 <div id="loading-progress" class="loading-progress"></div>
             </div>
-    <div id="loading-status">Initializing...</div>        </div>    </div>    <!-- Import the Transformers.js library using a proper browser build -->
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers" type="module"></script>
-    
-    <script type="module">
-        // Import the necessary components from Transformers.js
-        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
+    <div id="loading-status">Initializing...</div>        </div>    </div>    <!-- Import the Transformers.js library with a specific version known to work well -->
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.1"></script>
+    <script>
+        // Set up a global function to check when the library is available
+        function checkTransformersLoaded() {
+            if (window.pipeline) {
+                console.log("Transformers library loaded successfully");
+                // When library is loaded, load our script
+                const script = document.createElement('script');
+                script.src = "script.js";
+                document.body.appendChild(script);
+            } else {
+                console.log("Waiting for transformers to load...");
+                setTimeout(checkTransformersLoaded, 100);
+            }
+        }
         
-        // Make them available globally
-        window.pipeline = pipeline;
-        window.env = env;
-        window.Transformers = { pipeline, env };
+        // Start checking if transformers is loaded
+        setTimeout(checkTransformersLoaded, 100);
         
-        console.log("Transformers library loaded successfully");
+        console.log("Transformers library loaded successfully:", window.pipeline ? "pipeline available" : "pipeline missing");
         
         // Now load our application script
         const script = document.createElement('script');
         script.src = "script.js";
+        script.onload = () => console.log("Application script loaded");
         document.body.appendChild(script);
     </script>
     <script>        // Register service worker for PWA functionality

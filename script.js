@@ -1,12 +1,7 @@
-// Wait until the Transformers object is available
 // Model configuration
 const MODEL_ID = 'Xenova/distilgpt2';
 const MAX_NEW_TOKENS = 100;
 const MAX_LENGTH = 200;
-
-// We'll access pipeline and env after the library is loaded
-let pipeline;
-let env;
 
 // DOM Elements
 const modelStatus = document.getElementById('model-status');
@@ -15,11 +10,6 @@ const generateBtn = document.getElementById('generate-btn');
 const outputText = document.getElementById('output-text');
 const loadingProgress = document.getElementById('loading-progress');
 const loadingStatus = document.getElementById('loading-status');
-
-// Wait a moment to ensure the DOM is fully loaded before initializing
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initializeModel, 500);
-});
 
 // Class to handle loading status updates
 class MyProgressCallback {
@@ -60,21 +50,7 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        // Check if the library has been loaded and exposed globally
-        if (typeof window.pipeline === 'undefined') {
-            loadingStatus.textContent = "Waiting for library to load...";
-            setTimeout(initializeModel, 500);
-            return;
-        }
-
-        // Access pipeline and env from the global objects set by the module script
-        pipeline = window.pipeline;
-        env = window.env;
-        
-        // Configure WASM backend if env is available
-        if (env && env.backends && env.backends.onnx) {
-            env.backends.onnx.wasm.numThreads = 1;
-        }
+        console.log("Starting model initialization");
         
         // Initialize the pipeline
         generator = await pipeline(
@@ -84,12 +60,12 @@ async function initializeModel() {
                 progress_callback: new MyProgressCallback(),
             }
         );
-        
-        // Update UI when model is ready
+          // Update UI when model is ready
         modelStatus.textContent = 'Model ready!';
         modelStatus.classList.add('ready');
         generateBtn.disabled = false;
         loadingStatus.textContent = 'Model loaded successfully!';
+        console.log("Model initialization complete");
     } catch (error) {
         console.error('Error initializing the model:', error);
         modelStatus.textContent = 'Error loading model. See console for details.';
@@ -141,3 +117,6 @@ promptInput.addEventListener('keydown', (e) => {
         generateText();
     }
 });
+
+// Start initialization when the script is loaded
+initializeModel();
