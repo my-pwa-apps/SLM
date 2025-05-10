@@ -30,8 +30,34 @@
             <div id="loading-bar" class="loading-bar">
                 <div id="loading-progress" class="loading-progress"></div>
             </div>
-            <div id="loading-status">Initializing...</div>        </div>    </div>    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.8.0/dist/transformers.min.js"></script>
-    <script src="script.js"></script>
+    <div id="loading-status">Initializing...</div>        </div>    </div>
+    <script>
+        // Define a function to dynamically load the transformers library
+        function loadTransformers() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.8.0";
+                script.onload = () => {
+                    window.Transformers = { 
+                        pipeline: window.pipeline,
+                        env: window.env
+                    };
+                    resolve();
+                };
+                script.onerror = (error) => reject(error);
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Load the transformers library first, then load our script
+        loadTransformers()
+            .then(() => {
+                const script = document.createElement('script');
+                script.src = "script.js";
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Failed to load transformers library:', error));
+    </script>
     <script>        // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
