@@ -31,20 +31,12 @@
                 <div id="loading-progress" class="loading-progress"></div>
             </div>
             <div id="loading-status">Initializing...</div>
-        </div>    </div>    <script type="module">
-        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.8.0/dist/transformers.min.js';
-        window.Transformers = { pipeline, env };
-        
-        // Load our script after Transformers is available
-        const script = document.createElement('script');
-        script.src = "script.js";
-        document.body.appendChild(script);
-    </script>
-    <script>
-        // Register service worker for PWA functionality
+        </div>    </div>    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.8.0"></script>
+    <script src="script.js"></script>
+    <script>        // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('ServiceWorker registered with scope:', registration.scope);
                     })

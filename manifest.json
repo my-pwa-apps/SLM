@@ -2,7 +2,7 @@
   "name": "Simple Language Model",
   "short_name": "SLM",
   "description": "A browser-based language model that runs completely offline",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4285f4",

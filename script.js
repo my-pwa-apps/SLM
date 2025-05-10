@@ -55,7 +55,13 @@ class MyProgressCallback {
 let generator;
 async function initializeModel() {
     try {
-        // Get access to the pipeline function from the loaded library
+        // Wait for the Transformers library to be loaded
+        if (!window.Transformers) {
+            loadingStatus.textContent = "Waiting for library to load...";
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return initializeModel(); // Try again after a delay
+        }
+        
         pipeline = window.Transformers.pipeline;
         env = window.Transformers.env;
         
