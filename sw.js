@@ -41,7 +41,12 @@ self.addEventListener('fetch', event => {
 
   if (event.request.url === transformersUrl) {
     // Always fetch transformers.min.js from network directly
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      fetch(event.request).catch(error => {
+        console.error('Failed to fetch transformers.min.js:', error);
+        throw error;
+      })
+    );
     return;
   }
 
@@ -71,7 +76,10 @@ self.addEventListener('fetch', event => {
               
             return response;
           }
-        );
+        ).catch(error => {
+          console.error('Fetch failed for:', event.request.url, error);
+          throw error;
+        });
       })
   );
 });
