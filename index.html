@@ -37,11 +37,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM loaded, checking for transformers");
             
-            // Make the pipeline function available globally
-            window.pipeline = pipeline;
+            // The pipeline function is exposed under window.Xenova.pipeline by transformers.js
+            // No need to manually alias it.
             
             console.log("Transformers library setup complete:", 
-                        typeof pipeline === 'function' ? "pipeline available" : "pipeline missing");
+                        typeof window.Xenova !== 'undefined' && typeof window.Xenova.pipeline === 'function' ? "Xenova.pipeline available" : "Xenova.pipeline missing or Xenova undefined");
                         
             // Now load our application script
             const script = document.createElement('script');
@@ -49,7 +49,6 @@
             script.onload = () => console.log("Application script loaded");
             document.body.appendChild(script);
         });
-    </script>
     </script>
     <script>        // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
